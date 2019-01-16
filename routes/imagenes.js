@@ -21,3 +21,9 @@ app.get('/:tipo/:img', (req, res, next) => {
 
 
 module.exports = app;
+
+//client id
+//160073853436-9rb6pme0r4ej11rekcsomv0322mhjf3g.apps.googleusercontent.com
+
+//cliente secret
+//4NSdbizPoixGepHbbUgvLRrU
