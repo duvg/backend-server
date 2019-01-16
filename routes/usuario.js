@@ -13,9 +13,14 @@ var Usuario = require('../models/usuario');
 // Obtener todos los usuarios
 //=====================================
 app.get('/', (req, res, next) => {
+    // Número de paginación
+    var desde = req.query.desde || 0;
+    desde = Number(desde);
 
-    //busqueda de los usuarios
+    // Búsqueda de los usuarios
     Usuario.find({}, 'nombre email img role')
+        .skip(5)
+        .limit(5)
         .exec(
             (err, usuarios) => {
                 // validar si existen errores
@@ -26,12 +31,15 @@ app.get('/', (req, res, next) => {
                         errors: err
                     });
                 }
+                Usuario.count((err, conteo) => {
+                    // Respuesta con todos los usuarios
+                    res.status(200).json({
+                        ok: true,
+                        usuarios: usuarios,
+                        total: conteo
+                    });
+                });
 
-                // respuesta con todos los usuarios
-                res.status(200).json({
-                    ok: true,
-                    usuarios: usuarios
-                })
             });
 
 });
@@ -53,6 +61,8 @@ app.post('/', mdAutenticacion.verificaToken, (req, res) => {
         img: body.img,
         role: body.role
     });
+
+
 
     //guardar el nuevo usuario
     usuario.save((err, usuarioGuardado) => {
