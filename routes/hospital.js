@@ -42,6 +42,35 @@ app.get('/', (req, res, next) => {
 });
 
 
+// =====================================
+// Buscar un hospital por el id
+// =====================================
+app.get('/:id', (req, res) => {
+    var id = req.params.id;
+
+    Hospital.findById(id, (err, hospital) => {
+        if (err) {
+            return res.status(500).json({
+                ok: false,
+                mensaje: 'Error hospital no encontrado',
+                errors: err
+            });
+        }
+
+        if (!hospital) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Error!, el hospital con id: ' + id + ' no existe',
+                errors: { message: 'Error!, el hospital con id: ' + id + ' no existe'}
+            });
+        }
+
+        res.status(200).json({
+            ok: true,
+            hospital: hospital
+        });
+    })
+});
 
 // =====================================
 // Crear un nuevo hospital

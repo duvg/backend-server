@@ -72,7 +72,7 @@ app.post('/google', async(req, res) => {
                 // respuesta de usuario logueado
                 res.status(200).json({
                     ok: true,
-                    usaurio: usuarioDB,
+                    usuario: usuarioDB,
                     token: token,
                     id: usuarioDB._id
                 });
@@ -83,7 +83,7 @@ app.post('/google', async(req, res) => {
 
             usuario.nombre = googleUser.nombre;
             usuario.email = googleUser.email;
-            usuario.img = googleUser.picture;
+            usuario.img = googleUser.img;
             usuario.google = true;
             usuario.password = 'XD';
 
@@ -153,7 +153,7 @@ app.post('/', (req, res) => {
         // respuesta de usuario logueado
         res.status(200).json({
             ok: true,
-            usaurio: usuarioDB,
+            usuario: usuarioDB,
             token: token,
             id: usuarioDB._id
         });

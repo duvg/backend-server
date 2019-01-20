@@ -18,8 +18,8 @@ app.get('/', (req, res, next) => {
     desde = Number(desde);
 
     // Búsqueda de los usuarios
-    Usuario.find({}, 'nombre email img role')
-        .skip(5)
+    Usuario.find({}, 'nombre email img role google')
+        .skip(desde)
         .limit(5)
         .exec(
             (err, usuarios) => {
@@ -49,7 +49,7 @@ app.get('/', (req, res, next) => {
 // =====================================
 // Crear un nuevo usuario
 // =====================================
-app.post('/', mdAutenticacion.verificaToken, (req, res) => {
+app.post('/', (req, res) => {
     // recivir el cuerpor del la peticion
     var body = req.body;
 
