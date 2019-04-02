@@ -13,6 +13,23 @@ var Usuario = require('../models/usuario');
 const { OAuth2Client } = require('google-auth-library');
 const client = new OAuth2Client(CLIENT_ID);
 
+
+var mdAutenticacion = require('../middlewares/autenticacion');
+
+// =====================================
+// Renovar el token del usuario
+// =====================================
+app.get('/renuevatoken', mdAutenticacion.verificaToken, ( req, res) => {
+
+    var token = jwt.sign({ usuario: req.usuario }, SEED, { expiresIn: 14400 }); // duración de 4 horas
+
+    res.status(200).json({
+        ok: true,
+        usuario: req.usuario,
+        token: token
+    });
+});
+
 // =====================================
 // Autenticación de Google
 // =====================================
@@ -74,7 +91,8 @@ app.post('/google', async(req, res) => {
                     ok: true,
                     usuario: usuarioDB,
                     token: token,
-                    id: usuarioDB._id
+                    id: usuarioDB._id,
+                    menu: obtenerMenu(usuarioDB.role)
                 });
             }
         } else {
@@ -98,14 +116,15 @@ app.post('/google', async(req, res) => {
 
 
                 // Crear un token
-                var token = jwt.sign({ usuario: usuarioDB }, SEED, { expiresIn: 14400 }); // duracion de 4 horas
+                var token = jwt.sign({ usuario: usuarioGuardado }, SEED, { expiresIn: 14400 }); // duracion de 4 horas
 
                 // respuesta de usuario logueado
                 res.status(200).json({
                     ok: true,
                     usuario: usuarioGuardado,
                     token: token,
-                    googleUser: googleUser
+                    googleUser: googleUser,
+                    menu: obtenerMenu(usuarioGuardado.role)
                 });
             });
         }
@@ -132,7 +151,7 @@ app.post('/', (req, res) => {
         if (!usuarioDB) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Credenciales invalidas - email',
+                mensaje: 'Credenciales invalidas',
                 errors: err
             });
         }
@@ -141,7 +160,7 @@ app.post('/', (req, res) => {
         if (!bcrypt.compareSync(body.password, usuarioDB.password)) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'Credenciales invalidas - password',
+                mensaje: 'Credenciales invalidas',
                 errors: err
             });
         }
@@ -155,12 +174,44 @@ app.post('/', (req, res) => {
             ok: true,
             usuario: usuarioDB,
             token: token,
-            id: usuarioDB._id
+            id: usuarioDB._id,
+            menu: obtenerMenu(usuarioDB.role)
         });
     });
 
 
 });
+
+function obtenerMenu(ROLE) {
+
+    var menu = [{
+            titulo: 'Principal',
+            icono: 'mdi mdi-gauge',
+            submenu: [
+                { titulo: 'Dashboard', url: '/dashboard' },
+                { titulo: 'ProgressBar', url: '/progress' },
+                { titulo: 'Graficas', url: '/graficas1' },
+                { titulo: 'Promesas', url: '/promesas' },
+                { titulo: 'Rxjs', url: '/rxjs' },
+            ]
+        },
+        {
+            titulo: 'Mantenimientos',
+            icono: 'mdi mdi-folder-locl-open',
+            submenu: [
+                //{ titulo: 'Usuarios', url: '/usuarios'},
+                { titulo: 'Hospitales', url: '/hospitales' },
+                { titulo: 'Medicos', url: '/medicos' },
+            ]
+        }
+    ];
+
+    if (ROLE === 'ADMIN_ROLE') {
+        menu[1].submenu.unshift({ titulo: 'Usuarios', url: '/usuarios' });
+    }
+
+    return menu;
+}
 
 
 module.exports = app;

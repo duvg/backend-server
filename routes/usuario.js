@@ -71,7 +71,7 @@ app.post('/', (req, res) => {
             return res.status(400).json({
                 ok: false,
                 mensaje: 'Error creando el usuario',
-                error: err
+                errors: err
             });
         }
 
@@ -87,8 +87,8 @@ app.post('/', (req, res) => {
 // =====================================
 // Actualizar usuario
 // =====================================
-app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
-    var id = req.params.id;
+app.put('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdmin_MismoUsuario], (req, res) => {
+    var id = req.params.id; 
     var body = req.body;
 
     Usuario.findById(id, (err, usuario) => {
@@ -138,7 +138,7 @@ app.put('/:id', mdAutenticacion.verificaToken, (req, res) => {
 // Eliminar usuario
 // =====================================
 
-app.delete('/:id', mdAutenticacion.verificaToken, (req, res) => {
+app.delete('/:id', [mdAutenticacion.verificaToken, mdAutenticacion.verificaAdminRole], (req, res) => {
     var id = req.params.id;
 
     Usuario.findByIdAndRemove(id, (err, usaurioBorrado) => {
